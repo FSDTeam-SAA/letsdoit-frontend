@@ -8,7 +8,7 @@ export default function NotFound() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setShow(true), 100); // trigger animation
+    setTimeout(() => setShow(true), 100); 
   }, []);
 
   return (

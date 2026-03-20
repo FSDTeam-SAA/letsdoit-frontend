@@ -33,7 +33,7 @@ export default function Navbar() {
 
   return (
     <header className="w-full bg-[#FFFFFF] sticky top-0 z-50">
-      <div className="mx-auto  flex h-[72px] container items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto  flex h-[72px] container items-center justify-between px-4 sm:px-6 lg:px-0">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[4px] bg-[#F4BE18]">
