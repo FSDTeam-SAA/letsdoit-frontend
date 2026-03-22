@@ -82,7 +82,7 @@ export default function Navbar() {
             asChild
             className="h-[48px] rounded-full bg-[#FBBF24] px-6 text-[16px] font-blod text-[#1E3A8A] shadow-none hover:bg-[#e2ae11]"
           >
-            <Link href="/inspection-request">Inspection Request</Link>
+            <Link href="/quote">Inspection Request</Link>
           </Button>
         </div>
 

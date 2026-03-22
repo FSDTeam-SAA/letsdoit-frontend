@@ -15,6 +15,8 @@ export default function NewPasswordPage() {
           <Image
             src="/auth.png"
             alt="Reset password side"
+            width={1000}
+            height={1000}
             className="h-full w-full object-cover"
           />
         </div>

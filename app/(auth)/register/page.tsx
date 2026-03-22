@@ -37,6 +37,8 @@ export default function RegisterPage() {
           <Image
             src={leftImage}
             alt="Registration illustration"
+            width={1000}
+            height={1000}
             className="h-screen w-full object-cover object-center"
           />
         </div>
