@@ -44,7 +44,7 @@ const includedItems = [
 
 export default function IncludedInspectionSection() {
   return (
-    <section className="w-full bg-[#f7f7f5] px-4 py-12 sm:px-6 sm:py-16 lg:px-0 lg:py-20">
+    <section className="w-full bg-[#f7f7f5] px-4 py-12 sm:px-6 sm:py-16 lg:px-4 lg:py-20">
       <div className="mx-auto container">
         {/* Top content */}
         <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_699px] lg:gap-10">

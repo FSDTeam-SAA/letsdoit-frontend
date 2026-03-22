@@ -33,33 +33,33 @@ export default function Navbar() {
 
   return (
     <header className="w-full bg-[#FFFFFF] sticky top-0 z-50">
-      <div className="mx-auto  flex h-[72px] container items-center justify-between px-4 sm:px-6 lg:px-0">
+      <div className="mx-auto flex h-[72px] container items-center justify-between px-4 sm:px-6 lg:px-4 xl:px-0">
         {/* Left: Logo */}
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[4px] bg-[#F4BE18]">
-            <span className="text-[18px] font-bold leading-none text-[#111111]">
+        <Link href="/" className="flex shrink-0 items-center gap-3 lg:gap-2 xl:gap-3">
+          <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[4px] bg-[#F4BE18] lg:h-[30px] lg:w-[30px] xl:h-[34px] xl:w-[34px]">
+            <span className="text-[18px] font-bold leading-none text-[#111111] lg:text-[16px] xl:text-[18px]">
               AI
             </span>
           </div>
 
           <div className="leading-tight">
-            <h2 className="text-[15px] font-semibold uppercase tracking-[0.02em] text-[#111111]">
+            <h2 className="text-[15px] font-semibold uppercase tracking-[0.02em] text-[#111111] lg:text-[13px] xl:text-[15px]">
               AUTO INTEL
             </h2>
-            <p className="text-[11px] font-medium text-[#5B5B5B]">
+            <p className="text-[11px] font-medium text-[#5B5B5B] lg:text-[10px] xl:text-[11px]">
               Pre-Purchase Inspection Experts
             </p>
           </div>
         </Link>
 
         {/* Center: Desktop Nav */}
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex lg:gap-3 xl:gap-8">
           {navLinks.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className={`text-[18px] font-medium transition hover:text-[#F4BE18] ${
+              className={`whitespace-nowrap text-[18px] font-medium transition hover:text-[#F4BE18] lg:text-[13px] xl:text-[18px] ${
                 isActive(item.href) ? "text-[#F4BE18]" : "text-[#131313]"
               }`}
             >
@@ -69,18 +69,18 @@ export default function Navbar() {
         </nav>
 
         {/* Right: Desktop Buttons */}
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex lg:gap-2 xl:gap-4">
           <Button
             asChild
             variant="outline"
-            className="h-[48px] rounded-full border-[#FBBF24] bg-transparent px-[55px] text-[16px] font-blod text-[#1E3A8A] hover:bg-[#fff7db]"
+            className="h-[48px] rounded-full border-[#FBBF24] bg-transparent px-[55px] text-[16px] font-blod text-[#1E3A8A] hover:bg-[#fff7db] lg:h-[38px] lg:px-3 lg:text-[13px] xl:h-[48px] xl:px-[55px] xl:text-[16px]"
           >
             <Link href="/join-our-team">Join Our Team</Link>
           </Button>
 
           <Button
             asChild
-            className="h-[48px] rounded-full bg-[#FBBF24] px-6 text-[16px] font-blod text-[#1E3A8A] shadow-none hover:bg-[#e2ae11]"
+            className="h-[48px] rounded-full bg-[#FBBF24] px-6 text-[16px] font-blod text-[#1E3A8A] shadow-none hover:bg-[#e2ae11] lg:h-[38px] lg:px-3 lg:text-[13px] xl:h-[48px] xl:px-6 xl:text-[16px]"
           >
             <Link href="/quote">Inspection Request</Link>
           </Button>
