@@ -6,7 +6,7 @@ import { ShieldCheck, CalendarDays } from "lucide-react";
 export default function InspectionIncludedSection() {
   return (
     <section className="w-full bg-[#f5f1e4] py-12 sm:py-14 md:py-16 lg:py-24">
-      <div className="container mx-auto grid items-center gap-10 px-4 sm:px-6 md:gap-12 lg:grid-cols-2 lg:gap-16 lg:px-0">
+      <div className="container mx-auto grid items-center gap-10 px-4 sm:px-6 md:gap-12 lg:grid-cols-2 lg:gap-16 lg:px-4">
         {/* Left Image */}
         <div className="relative mx-auto w-full max-w-[620px]">
           <div className="relative h-[260px] w-full overflow-hidden rounded-[18px] sm:h-[360px] md:h-[460px] lg:h-[577px]">

@@ -26,7 +26,7 @@ const steps = [
 export default function InspectionSteps() {
   return (
     <section className="w-full bg-[#424242] py-[96px]">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-0">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-4">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step) => (
             <div

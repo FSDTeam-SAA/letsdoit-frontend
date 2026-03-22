@@ -139,7 +139,7 @@ const inspectionCards = [
 export default function InspectionProcessSection() {
   return (
     <section className="w-full bg-[#f7f2e4] py-12 sm:py-14 md:py-16 lg:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-0">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-4">
         {/* Heading */}
         <div className="mx-auto w-[760px] text-center">
           <h2 className="text-[28px] font-bold leading-[1.15] tracking-[-0.02em] text-[#161616] sm:text-[36px] md:text-[42px] lg:text-[40px]">

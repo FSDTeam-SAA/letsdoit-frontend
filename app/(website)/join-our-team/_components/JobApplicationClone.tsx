@@ -157,7 +157,7 @@ function SectionCard({
 
 export default function JobApplicationClone() {
   return (
-    <section className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-0">
+    <section className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-4">
       <div className="container mx-auto">
         {/* Top cards */}
         <div className="mx-auto grid max-w-[1260px] grid-cols-1 gap-3 lg:grid-cols-[1fr_1fr] lg:gap-4">

@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Right Content */}
-        <div className="flex items-center justify-center bg-[#f7f7f7] px-4 py-10 sm:px-8 md:px-10 lg:px-0">
+        <div className="flex items-center justify-center bg-[#f7f7f7] px-4 py-10 sm:px-8 md:px-10 lg:px-4">
           <div className="w-full max-w-[420px]">
             <h1 className="text-center text-[34px] font-semibold leading-tight text-[#252525] sm:text-[42px] lg:text-[40px]">
               Forget Password
