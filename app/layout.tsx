@@ -6,6 +6,7 @@ import SmoothScrollProvider from "@/components/provider/SmoothScrollProvider";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/components/provider/AuthProvider";
 import QueryProvider from "@/components/provider/QueryProvider";
+import InspectorRegistrationProvider from "@/components/provider/InspectorRegistrationProvider";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -30,9 +31,11 @@ export default function RootLayout({
       <NextTopLoader color="#FBBF24" height={3} showSpinner={false} />
       <SmoothScrollProvider>
          <AuthProvider>
-          <QueryProvider>      
-           {children}
-        <Toaster position="top-right" richColors />
+          <QueryProvider>
+            <InspectorRegistrationProvider>
+              {children}
+              <Toaster position="top-right" richColors />
+            </InspectorRegistrationProvider>
            </QueryProvider>
         </AuthProvider>
         </SmoothScrollProvider>
