@@ -17,6 +17,7 @@ export type CheckStatus = "ok" | "report" | "";
 export type TextChecklistItem = {
   id: string;
   title: string;
+  fieldName?: string;
   status: CheckStatus;
   note: string;
 };
@@ -24,6 +25,7 @@ export type TextChecklistItem = {
 export type PhotoChecklistItem = {
   id: string;
   title: string;
+  fieldName?: string;
   file: File | null;
   preview: string;
 };

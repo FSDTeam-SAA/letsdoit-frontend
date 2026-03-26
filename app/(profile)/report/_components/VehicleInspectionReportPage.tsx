@@ -278,6 +278,27 @@ function buildTableRows(items: TextChecklistItem[]) {
   }));
 }
 
+function normalizeReportData(raw?: Partial<ReportData> | null): ReportData {
+  if (!raw) return emptyReportData;
+
+  return {
+    ...emptyReportData,
+    ...raw,
+    requiredPhotos: raw.requiredPhotos ?? [],
+    additionalPhotos: raw.additionalPhotos ?? [],
+    vehicleRepresentation: raw.vehicleRepresentation ?? [],
+    tiresBrakes: raw.tiresBrakes ?? [],
+    exterior: raw.exterior ?? [],
+    engine: raw.engine ?? [],
+    interior: raw.interior ?? [],
+    fluidCheck: raw.fluidCheck ?? [],
+    roadTest: raw.roadTest ?? [],
+    scanTool: raw.scanTool ?? [],
+    focusAreas: raw.focusAreas ?? [],
+    finalSummary: raw.finalSummary ?? { note: "" },
+  };
+}
+
 export default function VehicleInspectionReportPage() {
   const [reportData, setReportData] = useState<ReportData | null>(null);
 
@@ -285,7 +306,8 @@ export default function VehicleInspectionReportPage() {
     try {
       const raw = sessionStorage.getItem("inspectionReportData");
       if (raw) {
-        setReportData(JSON.parse(raw));
+        const parsed = JSON.parse(raw) as Partial<ReportData>;
+        setReportData(normalizeReportData(parsed));
       }
     } catch (error) {
       console.error("Failed to read inspection report data", error);

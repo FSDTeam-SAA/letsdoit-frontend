@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   InspectionFormData,
@@ -32,154 +34,180 @@ const steps: StepDefinition[] = [
   { key: "finalSummary", label: "Final Step" },
 ];
 
-function createTextItems(items: string[]): TextChecklistItem[] {
-  return items.map((title, index) => ({
-    id: `${title}-${index}`,
-    title,
+const REQUIRED_PHOTO_ITEMS = [
+  { title: "Front Interior", fieldName: "frontInterior" },
+  { title: "Front Exterior", fieldName: "frontExterior" },
+  { title: "Passenger Side", fieldName: "passengerSide" },
+  { title: "Left Fender", fieldName: "leftFender" },
+  { title: "Right Fender", fieldName: "rightFender" },
+  { title: "Left Quarter Panel", fieldName: "leftQuarterPanel" },
+  { title: "Right Quarter Panel", fieldName: "rightQuarterPanel" },
+  { title: "Rear Exterior", fieldName: "rearExterior" },
+  { title: "Front Bumper", fieldName: "frontBumper" },
+  { title: "Rear Bumper", fieldName: "rearBumper" },
+  { title: "Engine Bay", fieldName: "engineBay" },
+  { title: "VIN Plate", fieldName: "vinPlate" },
+  { title: "Odometer / Mileage", fieldName: "odometer" },
+  { title: "Dashboard Console", fieldName: "dashboardConsole" },
+  { title: "Front Seats - Driver", fieldName: "frontSeatsDriver" },
+  { title: "Front Seats - Passenger", fieldName: "frontSeatsPassenger" },
+  { title: "Rear Seats - Driver Side", fieldName: "rearSeatsDriverSide" },
+  { title: "Rear Seats - Passenger Side", fieldName: "rearSeatsPassengerSide" },
+  { title: "Flooring", fieldName: "flooring" },
+  { title: "Roof Interior", fieldName: "roofInterior" },
+  { title: "Undercarriage - Front", fieldName: "undercarriageFront" },
+  { title: "Undercarriage - Rear", fieldName: "undercarriageRear" },
+  { title: "Trunk Interior", fieldName: "trunkInterior" },
+  { title: "Wheel Photo - Driver Front", fieldName: "wheelPhotoDriverFront" },
+  { title: "Wheel Photo - Passenger Front", fieldName: "wheelPhotoPassengerFront" },
+  { title: "Wheel Photo - Driver Rear", fieldName: "wheelPhotoDriverRear" },
+  { title: "Wheel Photo - Passenger Rear", fieldName: "wheelPhotoPassengerRear" },
+];
+
+const VEHICLE_DOCUMENTATION_ITEMS = [
+  { title: "Owner manual present", fieldName: "ownerManualPresent" },
+  { title: "Service history", fieldName: "serviceHistory" },
+  { title: "Oil change record", fieldName: "oilChangeRecord" },
+  { title: "Major service record", fieldName: "majorServiceRecord" },
+  { title: "CarFax/AutoCheck", fieldName: "carfaxAutoCheck" },
+  { title: "Key count", fieldName: "keyCount" },
+  { title: "Glovebox key", fieldName: "gloveboxKey" },
+];
+
+const VEHICLE_TIRES_BRAKES_ITEMS = [
+  { title: "Tire size match", fieldName: "tireSizeMatch" },
+  { title: "Spare tire present", fieldName: "spareTirePresent" },
+  { title: "Tread depth DF", fieldName: "treadDepthDF" },
+  { title: "Tread depth PF", fieldName: "treadDepthPF" },
+  { title: "Tread depth DR", fieldName: "treadDepthDR" },
+  { title: "Tread depth PR", fieldName: "treadDepthPR" },
+  { title: "Brake pads front", fieldName: "brakePadsFront" },
+  { title: "Brake pads rear", fieldName: "brakePadsRear" },
+];
+
+const VEHICLE_EXTERIOR_ITEMS = [
+  { title: "Front alignment", fieldName: "frontAlignment" },
+  { title: "Hood", fieldName: "hood" },
+  { title: "Front bumper", fieldName: "frontBumper" },
+  { title: "Grille", fieldName: "grille" },
+  { title: "Windshield", fieldName: "windshield" },
+  { title: "Lights", fieldName: "lights" },
+  { title: "Left doors", fieldName: "leftDoors" },
+  { title: "Left rocker", fieldName: "leftRocker" },
+  { title: "Left mirror", fieldName: "leftMirror" },
+  { title: "Right doors", fieldName: "rightDoors" },
+  { title: "Right rocker", fieldName: "rightRocker" },
+  { title: "Right mirror", fieldName: "rightMirror" },
+  { title: "Rear bumper", fieldName: "rearBumper" },
+  { title: "Tailgate", fieldName: "tailgate" },
+  { title: "Quarter panels", fieldName: "quarterPanels" },
+  { title: "Rear lights", fieldName: "rearLights" },
+];
+
+const VEHICLE_ENGINE_ITEMS = [
+  { title: "Oil level", fieldName: "oilLevel" },
+  { title: "Coolant level", fieldName: "coolantLevel" },
+  { title: "Leaks", fieldName: "leaks" },
+  { title: "Belts", fieldName: "belts" },
+  { title: "Hoses", fieldName: "hoses" },
+  { title: "Battery", fieldName: "battery" },
+  { title: "Air filter", fieldName: "airFilter" },
+];
+
+const VEHICLE_INTERIOR_ITEMS = [
+  { title: "Odor", fieldName: "odor" },
+  { title: "Driver seat", fieldName: "driverSeat" },
+  { title: "Passenger seat", fieldName: "passengerSeat" },
+  { title: "Seat belts", fieldName: "seatBelts" },
+  { title: "Dash", fieldName: "dash" },
+  { title: "Console", fieldName: "console" },
+  { title: "Windows", fieldName: "windows" },
+  { title: "Locks", fieldName: "locks" },
+  { title: "Infotainment", fieldName: "infotainment" },
+  { title: "HVAC", fieldName: "hvac" },
+  { title: "Rear seats", fieldName: "rearSeats" },
+  { title: "Rear belts", fieldName: "rearBelts" },
+  { title: "Cargo area", fieldName: "cargoArea" },
+];
+
+const VEHICLE_FLUIDS_ITEMS = [
+  { title: "Engine oil", fieldName: "engineOil" },
+  { title: "Transmission fluid", fieldName: "transmissionFluid" },
+  { title: "Brake fluid", fieldName: "brakeFluid" },
+  { title: "Coolant", fieldName: "coolant" },
+  { title: "Power steering", fieldName: "powerSteering" },
+  { title: "Washer fluid", fieldName: "washerFluid" },
+];
+
+const VEHICLE_ROAD_TEST_ITEMS = [
+  { title: "Startup", fieldName: "startup" },
+  { title: "Idle", fieldName: "idle" },
+  { title: "Acceleration", fieldName: "acceleration" },
+  { title: "Transmission", fieldName: "transmission" },
+  { title: "Steering", fieldName: "steering" },
+  { title: "Brakes", fieldName: "brakes" },
+  { title: "Noise", fieldName: "noises" },
+  { title: "Suspension", fieldName: "suspension" },
+  { title: "Vibration", fieldName: "vibration" },
+  { title: "Cruise", fieldName: "cruise" },
+  { title: "AWD/4x4", fieldName: "awd4x4" },
+];
+
+const VEHICLE_SCAN_TOOL_ITEMS = [
+  { title: "Stored codes", fieldName: "storedCodes" },
+  { title: "Pending codes", fieldName: "pendingCodes" },
+  { title: "Monitor readiness", fieldName: "monitorReadiness" },
+];
+
+const VEHICLE_FOCUS_AREAS_ITEMS = [
+  { title: "Previous damage", fieldName: "previousDamage" },
+  { title: "Rust", fieldName: "rust" },
+  { title: "Leaks", fieldName: "leaks" },
+  { title: "Suspicious noises", fieldName: "suspiciousNoises" },
+];
+
+function createTextItems(
+  items: Array<{ title: string; fieldName?: string }>
+): TextChecklistItem[] {
+  return items.map((item, index) => ({
+    id: `${item.title}-${index}`,
+    title: item.title,
+    fieldName: item.fieldName,
     status: "",
     note: "",
   }));
 }
 
-function createPhotoItems(items: string[]): PhotoChecklistItem[] {
-  return items.map((title, index) => ({
-    id: `${title}-${index}`,
-    title,
+function createPhotoItems(
+  items: Array<{ title: string; fieldName?: string }>
+): PhotoChecklistItem[] {
+  return items.map((item, index) => ({
+    id: `${item.title}-${index}`,
+    title: item.title,
+    fieldName: item.fieldName,
     file: null,
     preview: "",
   }));
 }
 
 const initialData: InspectionFormData = {
-  requiredPhotos: createPhotoItems([
-    "Front Interior",
-    "Front Exterior",
-    "Passenger Side",
-    "Left Fender",
-    "Right Fender",
-    "Left Quarter Panel",
-    "Right Quarter Panel",
-    "Rear Exterior",
-    "Front Bumper",
-    "Rear Bumper",
-    "Engine Bay",
-    "VIN Plate",
-    "Odometer / Mileage",
-    "Dashboard Console",
-    "Front Seats - Driver",
-    "Front Seats - Passenger",
-    "Rear Seats - Driver Side",
-    "Rear Seats - Passenger Side",
-    "Flooring",
-    "Roof Interior",
-    "Undercarriage - Front",
-    "Undercarriage - Rear",
-    "Trunk Interior",
-    "Wheel Photo - Driver Front",
-    "Wheel Photo - Passenger Front",
-    "Wheel Photo - Driver Rear",
-    "Wheel Photo - Passenger Rear",
-  ]),
+  requiredPhotos: createPhotoItems(REQUIRED_PHOTO_ITEMS),
   additionalPhotos: createPhotoItems([
-    "Additional Photo #1",
-    "Additional Photo #2",
-    "Additional Photo #3",
-    "Additional Photo #4",
-    "Additional Photo #5",
+    { title: "Additional Photo #1" },
+    { title: "Additional Photo #2" },
+    { title: "Additional Photo #3" },
+    { title: "Additional Photo #4" },
+    { title: "Additional Photo #5" },
   ]),
-  vehicleRepresentation: createTextItems([
-    "Owner manual present",
-    "Service history",
-    "Oil change record",
-    "Major service record",
-    "CarFax/AutoCheck",
-    "Key count",
-    "Glovebox key",
-  ]),
-  tiresBrakes: createTextItems([
-    "Tire size match",
-    "Spare tire present",
-    "Tread depth DF",
-    "Tread depth PF",
-    "Tread depth DR",
-    "Tread depth PR",
-    "Brake pads front",
-    "Brake pads rear",
-  ]),
-  exterior: createTextItems([
-    "Front alignment",
-    "Hood",
-    "Front bumper",
-    "Grille",
-    "Windshield",
-    "Lights",
-    "Left doors",
-    "Left rocker",
-    "Left mirror",
-    "Right doors",
-    "Right rocker",
-    "Right mirror",
-    "Rear bumper",
-    "Tailgate",
-    "Quarter panels",
-    "Rear lights",
-  ]),
-  engine: createTextItems([
-    "Oil level",
-    "Coolant level",
-    "Leaks",
-    "Belts",
-    "Hoses",
-    "Battery",
-    "Air filter",
-  ]),
-  interior: createTextItems([
-    "Door",
-    "Driver seat",
-    "Passenger seat",
-    "Seat belts",
-    "Dash",
-    "Console",
-    "Windows",
-    "Locks",
-    "Infotainment",
-    "HVAC",
-    "Rear seats",
-    "Rear belts",
-    "Cargo area",
-  ]),
-  fluidCheck: createTextItems([
-    "Engine oil",
-    "Transmission fluid",
-    "Brake fluid",
-    "Coolant",
-    "Power steering",
-    "Washer fluid",
-  ]),
-  roadTest: createTextItems([
-    "Startup",
-    "Idle",
-    "Acceleration",
-    "Transmission",
-    "Steering",
-    "Brakes",
-    "Noise",
-    "Suspension",
-    "Vibration",
-    "Cruise",
-    "AWD/4x4",
-  ]),
-  scanTool: createTextItems([
-    "Stored codes",
-    "Pending codes",
-    "Monitor readiness",
-  ]),
-  focusAreas: createTextItems([
-    "Previous damage",
-    "Rust",
-    "Leaks",
-    "Suspicious noises",
-  ]),
+  vehicleRepresentation: createTextItems(VEHICLE_DOCUMENTATION_ITEMS),
+  tiresBrakes: createTextItems(VEHICLE_TIRES_BRAKES_ITEMS),
+  exterior: createTextItems(VEHICLE_EXTERIOR_ITEMS),
+  engine: createTextItems(VEHICLE_ENGINE_ITEMS),
+  interior: createTextItems(VEHICLE_INTERIOR_ITEMS),
+  fluidCheck: createTextItems(VEHICLE_FLUIDS_ITEMS),
+  roadTest: createTextItems(VEHICLE_ROAD_TEST_ITEMS),
+  scanTool: createTextItems(VEHICLE_SCAN_TOOL_ITEMS),
+  focusAreas: createTextItems(VEHICLE_FOCUS_AREAS_ITEMS),
   finalSummary: {
     note: "",
   },
@@ -253,10 +281,16 @@ function PhotoStepSection({
   );
 }
 
-export function InspectionMultiStepForm() {
+export function InspectionMultiStepForm({ bookingId }: { bookingId?: string }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [formData, setFormData] = useState<InspectionFormData>(initialData);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [checklistId, setChecklistId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
+  const token = session?.accessToken as string | undefined;
 
   const currentStep = steps[currentStepIndex];
 
@@ -294,6 +328,18 @@ export function InspectionMultiStepForm() {
         item.id === itemId ? { ...item, file, preview } : item
       ),
     }));
+  };
+
+  const buildTextPayload = (items: TextChecklistItem[]) => {
+    return items.reduce((acc, item) => {
+      if (!item.fieldName) return acc;
+      const status = item.status === "report" ? false : true;
+      acc[item.fieldName] = {
+        status,
+        notes: item.note?.trim() ?? "",
+      };
+      return acc;
+    }, {} as Record<string, { status: boolean; notes: string }>);
   };
 
   const stepContent = useMemo(() => {
@@ -454,7 +500,173 @@ export function InspectionMultiStepForm() {
     }
   };
 
-  const handleSubmit = () => {
+  const uploadPhotoChecklist = async () => {
+    if (!bookingId) {
+      setUploadError("Booking ID is missing. Please reload and try again.");
+      return false;
+    }
+
+    const formPayload = new FormData();
+    formPayload.append("bookingId", bookingId);
+
+    formData.requiredPhotos.forEach((item) => {
+      if (!item.file) return;
+      if (item.fieldName) {
+        formPayload.append(item.fieldName, item.file, item.file.name);
+      }
+    });
+
+    formData.additionalPhotos.forEach((item) => {
+      if (!item.file) return;
+      formPayload.append("additionalPhotos", item.file, item.file.name);
+    });
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/inspection-checklists/photo-upload`,
+        {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          body: formPayload,
+        }
+      );
+
+      if (!response.ok) {
+        let message = "Failed to upload photos. Please try again.";
+        try {
+          const json = await response.json();
+          if (json?.message) {
+            message = json.message;
+          }
+        } catch (error) {
+          console.error("Failed to parse upload response", error);
+        }
+        setUploadError(message);
+        return false;
+      }
+
+      try {
+        const json = await response.json();
+        const resolvedChecklistId =
+          json?.checklistId ??
+          json?.data?.checklistId ??
+          json?.data?._id ??
+          json?._id ??
+          json?.data?.id ??
+          json?.id ??
+          null;
+        if (resolvedChecklistId) {
+          setChecklistId(String(resolvedChecklistId));
+        }
+      } catch (error) {
+        console.error("Failed to read checklist id from response", error);
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Photo upload error", error);
+      setUploadError("Network error while uploading photos. Please try again.");
+      return false;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (currentStep.key === "additionalPhotos") {
+      if (isUploading) return;
+      const ok = await uploadPhotoChecklist();
+      if (ok) nextStep();
+      return;
+    }
+
+    nextStep();
+  };
+
+  const buildVehicleChecklistPayload = () => {
+    const summaryNote = formData.finalSummary.note.trim();
+
+    return {
+      title: "Inspection Checklist",
+      notes: summaryNote,
+      checklistId,
+      bookingId,
+      vehicleDocumentation: buildTextPayload(formData.vehicleRepresentation),
+      vehicleTiresBrakes: buildTextPayload(formData.tiresBrakes),
+      vehicleExterior: buildTextPayload(formData.exterior),
+      vehicleEngine: buildTextPayload(formData.engine),
+      vehicleInterior: buildTextPayload(formData.interior),
+      vehicleFluids: buildTextPayload(formData.fluidCheck),
+      vehicleRoadTest: buildTextPayload(formData.roadTest),
+      vehicleScanTool: buildTextPayload(formData.scanTool),
+      vehicleFocusAreas: buildTextPayload(formData.focusAreas),
+      finalSummary: {
+        notes: summaryNote,
+      },
+    };
+  };
+
+  const submitVehicleChecklist = async () => {
+    if (!bookingId) {
+      toast.error("Booking ID is missing. Please reload and try again.");
+      return false;
+    }
+
+    if (!checklistId) {
+      toast.error("Checklist ID is missing. Please upload photos first.");
+      return false;
+    }
+
+    const payload = buildVehicleChecklistPayload();
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/inspection-checklists/vehicle-documentation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        let message = "Failed to submit checklist. Please try again.";
+        try {
+          const json = await response.json();
+          if (json?.message) {
+            message = json.message;
+          }
+        } catch (error) {
+          console.error("Failed to parse checklist response", error);
+        }
+        toast.error(message);
+        return false;
+      }
+
+      toast.success("Checklist submitted successfully.");
+      return true;
+    } catch (error) {
+      console.error("Checklist submission error", error);
+      toast.error("Network error while submitting checklist.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+
+    const ok = await submitVehicleChecklist();
+    if (!ok) return;
+
     const payload = {
       ...formData,
       requiredPhotos: formData.requiredPhotos.map((item) => ({
@@ -504,20 +716,30 @@ export function InspectionMultiStepForm() {
                 <Button
                   type="button"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                   className="h-[42px] w-full rounded-[6px] bg-[#f4bc18] text-sm font-semibold text-black hover:bg-[#e5ad08]"
                 >
-                  Submit
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
               ) : (
                 <Button
                   type="button"
-                  onClick={nextStep}
+                  onClick={handleNext}
+                  disabled={isUploading}
                   className="h-[42px] w-full rounded-[6px] bg-[#f4bc18] text-sm font-semibold text-black hover:bg-[#e5ad08]"
                 >
-                  Next
+                  {currentStep.key === "additionalPhotos" && isUploading
+                    ? "Uploading..."
+                    : "Next"}
                 </Button>
               )}
             </div>
+
+            {uploadError ? (
+              <p className="mt-2 text-sm font-medium text-red-600">
+                {uploadError}
+              </p>
+            ) : null}
           </div>
 
           <div className="xl:sticky xl:top-6 xl:self-start">
