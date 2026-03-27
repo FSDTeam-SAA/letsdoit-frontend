@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { CalendarDays, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function HeroSection() {
  
@@ -39,12 +40,14 @@ export default function HeroSection() {
 
           {/* Buttons */}
           <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
+            <Link href="/packages">
             <Button
               className="h-12 rounded-full bg-[#FBBF24] px-6 text-[18px] font-bold text-[#1E3A8A] shadow-none hover:bg-[#e0aa10] sm:h-[56px] sm:px-7"
             >
               <CalendarDays className="mr-2 h-4 w-4" />
               View All Packages &amp; Book
             </Button>
+            </Link>
 
             <Button
               variant="outline"

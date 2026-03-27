@@ -20,7 +20,7 @@ const navLinks = [
   { label: "Services Area", href: "/services-area" },
   { label: "About Us", href: "/about-us" },
   { label: "How It Works", href: "/how-it-work" },
-  { label: "Sample Report", href: "/sample-report" },
+  // { label: "Sample Report", href: "/sample-report" },
 ];
 
 export default function Navbar() {

@@ -192,7 +192,9 @@ export default function MyJobsTable() {
     const rawPagination = json?.pagination ?? rawData?.pagination;
     let items: Booking[] = [];
 
-    if (Array.isArray(rawData)) {
+    if (Array.isArray(rawData?.bookings)) {
+      items = rawData.bookings;
+    } else if (Array.isArray(rawData)) {
       items = rawData;
     } else if (Array.isArray(rawData?.items)) {
       items = rawData.items;
