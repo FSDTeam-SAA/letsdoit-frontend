@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import type { JobStats } from "./JobStatsCards";
 
 // Skeleton Component
 function JobSkeleton({ isMobile = false }: { isMobile?: boolean }) {
@@ -89,6 +90,7 @@ type Pagination = {
 type BookingQueryData = {
   items: Booking[];
   pagination: Pagination;
+  stats: JobStats | null;
 };
 
 type PageItem = number | "ellipsis";
@@ -111,7 +113,11 @@ type PaginationLike = Partial<{
   total_pages: number;
 }>;
 
-export default function MyJobsTable() {
+type MyJobsTableProps = {
+  onStatsChange?: (stats: JobStats | null) => void;
+};
+
+export default function MyJobsTable({ onStatsChange }: MyJobsTableProps) {
   const { data: session, status: sessionStatus } = useSession();
   const token = session?.accessToken;
   const [searchTerm, setSearchTerm] = useState("");
@@ -190,6 +196,7 @@ export default function MyJobsTable() {
 
     const rawData = json?.data;
     const rawPagination = json?.pagination ?? rawData?.pagination;
+    const rawStats = rawData?.stats ?? json?.stats;
     let items: Booking[] = [];
 
     if (Array.isArray(rawData?.bookings)) {
@@ -204,7 +211,16 @@ export default function MyJobsTable() {
 
     const pagination = normalizePagination(rawPagination, items.length, page, pageSize);
 
-    return { items, pagination };
+    const stats: JobStats | null = rawStats
+      ? {
+          totalJobs: Number(rawStats?.totalJobs ?? 0),
+          totalPending: Number(rawStats?.totalPending ?? 0),
+          totalInProgress: Number(rawStats?.totalInProgress ?? 0),
+          totalCompleted: Number(rawStats?.totalCompleted ?? 0),
+        }
+      : null;
+
+    return { items, pagination, stats };
   };
 
   const { data, isLoading, error, isFetching } = useQuery({
@@ -221,6 +237,11 @@ export default function MyJobsTable() {
     total: bookings.length,
     totalPages: 1,
   };
+  const stats = data?.stats ?? null;
+
+  useEffect(() => {
+    onStatsChange?.(stats);
+  }, [onStatsChange, stats]);
 
   // Optional: client-side filter by status or name (you can enhance this)
   const filteredBookings = useMemo(() => {
